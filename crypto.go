@@ -257,12 +257,10 @@ func GetRSAPrivateKey(directory, name string, password []byte) (*rsa.PrivateKey,
 	}
 
 	priv, err := x509.ParsePKCS8PrivateKey(decrypted)
-	switch k := priv.(type) {
-	case *rsa.PrivateKey:
-		return k, nil
-	default:
-		return nil, errors.New(ERROR_UNSUPPORTED_PRIVATE_KEY_TYPE)
+	if err != nil {
+		return nil, err
 	}
+	return PrivateKeyToRSAPrivateKey(priv)
 }
 
 func GetPassword() ([]byte, error) {
