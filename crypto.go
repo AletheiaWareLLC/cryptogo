@@ -54,6 +54,15 @@ const (
 	ERROR_UNSUPPORTED_SIGNATURE          = "Unsupported Signature Algorithm: %s"
 )
 
+func RandomString(size uint) (string, error) {
+	buffer := make([]byte, size)
+	_, err := rand.Read(buffer)
+	if err != nil {
+		return "", err
+	}
+	return base64.RawURLEncoding.EncodeToString(buffer), nil
+}
+
 func Hash(data []byte) []byte {
 	hash := sha512.Sum512(data)
 	return hash[:]
