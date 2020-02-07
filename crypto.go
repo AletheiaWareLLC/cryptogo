@@ -46,6 +46,7 @@ const (
 	AES_KEY_SIZE_BYTES = AES_KEY_SIZE_BITS / 8
 
 	ERROR_EXPORT                         = "Export error: %d %s"
+	ERROR_PASSWORDS_DO_NOT_MATCH         = "Passwords Do Not Match"
 	ERROR_UNSUPPORTED_ENCRYPTION         = "Unsupported encryption: %s"
 	ERROR_UNSUPPORTED_PUBLIC_KEY_TYPE    = "Unsupported Public Key Type: %s"
 	ERROR_UNSUPPORTED_PRIVATE_KEY_TYPE   = "Unsupported Private Key Type: %s"
@@ -268,27 +269,32 @@ func GetPassword() ([]byte, error) {
 	if ok {
 		return []byte(pwd), nil
 	} else {
-		log.Print("Enter keystore password: ")
-		password, err := terminal.ReadPassword(int(syscall.Stdin))
-		if err != nil {
-			return nil, err
-		}
-		log.Println()
-		return password, nil
+		return ReadPassword("Enter keystore password: ")
 	}
+}
+
+func ReadPassword(prompt string) ([]byte, error) {
+	log.Print(prompt)
+	password, err := terminal.ReadPassword(int(syscall.Stdin))
+	if err != nil {
+		return nil, err
+	}
+	log.Println()
+	return password, nil
 }
 
 func GetOrCreateRSAPrivateKey(directory, name string) (*rsa.PrivateKey, error) {
 	if HasRSAPrivateKey(directory, name) {
-		log.Println("Found keystore under " + directory + " for " + name)
 		password, err := GetPassword()
 		if err != nil {
 			return nil, err
 		}
+
 		key, err := GetRSAPrivateKey(directory, name, password)
 		if err != nil {
 			return nil, err
 		}
+
 		return key, nil
 	} else {
 		log.Println("Creating keystore under " + directory + " for " + name)
@@ -298,15 +304,13 @@ func GetOrCreateRSAPrivateKey(directory, name string) (*rsa.PrivateKey, error) {
 			return nil, err
 		}
 
-		log.Print("Confirm keystore password: ")
-		confirm, err := terminal.ReadPassword(int(syscall.Stdin))
+		confirm, err := ReadPassword("Confirm keystore password: ")
 		if err != nil {
 			return nil, err
 		}
-		log.Println()
 
 		if !bytes.Equal(password, confirm) {
-			log.Fatal("Passwords don't match")
+			return nil, errors.New(ERROR_PASSWORDS_DO_NOT_MATCH)
 		}
 
 		key, err := CreateRSAPrivateKey(directory, name, password)
