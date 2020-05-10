@@ -284,12 +284,11 @@ func ReadPassword(prompt string) ([]byte, error) {
 }
 
 func GetOrCreateRSAPrivateKey(directory, name string) (*rsa.PrivateKey, error) {
+	password, err := GetPassword()
+	if err != nil {
+		return nil, err
+	}
 	if HasRSAPrivateKey(directory, name) {
-		password, err := GetPassword()
-		if err != nil {
-			return nil, err
-		}
-
 		key, err := GetRSAPrivateKey(directory, name, password)
 		if err != nil {
 			return nil, err
@@ -298,11 +297,6 @@ func GetOrCreateRSAPrivateKey(directory, name string) (*rsa.PrivateKey, error) {
 		return key, nil
 	} else {
 		log.Println("Creating keystore under " + directory + " for " + name)
-
-		password, err := GetPassword()
-		if err != nil {
-			return nil, err
-		}
 
 		confirm, err := ReadPassword("Confirm keystore password: ")
 		if err != nil {
