@@ -45,7 +45,10 @@ const (
 	AES_KEY_SIZE_BITS  = 128
 	AES_KEY_SIZE_BYTES = AES_KEY_SIZE_BITS / 8
 
+	MIN_PASSWORD = 12
+
 	ERROR_EXPORT                         = "Export error: %d %s"
+	ERROR_PASSWORD_TOO_SHORT             = "Password Too Short: %d Minimum: %d"
 	ERROR_PASSWORDS_DO_NOT_MATCH         = "Passwords Do Not Match"
 	ERROR_UNSUPPORTED_ENCRYPTION         = "Unsupported encryption: %s"
 	ERROR_UNSUPPORTED_PUBLIC_KEY_TYPE    = "Unsupported Public Key Type: %s"
