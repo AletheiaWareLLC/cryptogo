@@ -38,6 +38,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strings"
 	"syscall"
 )
 
@@ -56,6 +57,8 @@ const (
 	ERROR_UNSUPPORTED_PUBLIC_KEY_FORMAT  = "Unsupported Public Key Format: %s"
 	ERROR_UNSUPPORTED_PRIVATE_KEY_FORMAT = "Unsupported Private Key Format: %s"
 	ERROR_UNSUPPORTED_SIGNATURE          = "Unsupported Signature Algorithm: %s"
+
+	privateKeyFileExtension = ".go.private"
 )
 
 func RandomString(size uint) (string, error) {
@@ -206,13 +209,28 @@ func ParseRSAPrivateKey(privateKey []byte, format PrivateKeyFormat) (*rsa.Privat
 }
 
 func HasRSAPrivateKey(directory, name string) bool {
-	_, err := os.Stat(path.Join(directory, name+".go.private"))
+	_, err := os.Stat(path.Join(directory, name+privateKeyFileExtension))
 	if err != nil {
 		if os.IsNotExist(err) {
 			return false
 		}
 	}
 	return true
+}
+
+func ListRSAPrivateKeys(directory string) ([]string, error) {
+	files, err := ioutil.ReadDir(directory)
+	if err != nil {
+		return nil, err
+	}
+	var keys []string
+	for _, f := range files {
+		name := f.Name()
+		if strings.HasSuffix(name, privateKeyFileExtension) {
+			keys = append(keys, strings.TrimSuffix(name, privateKeyFileExtension))
+		}
+	}
+	return keys, nil
 }
 
 func CreateRSAPrivateKey(directory, name string, password []byte) (*rsa.PrivateKey, error) {
@@ -242,7 +260,7 @@ func WriteRSAPrivateKey(privateKey *rsa.PrivateKey, directory, name string, pass
 	}
 
 	// Write Private Key PEM block to file
-	if err := WritePEM(privateKeyPEM, path.Join(directory, name+".go.private")); err != nil {
+	if err := WritePEM(privateKeyPEM, path.Join(directory, name+privateKeyFileExtension)); err != nil {
 		return err
 	}
 
@@ -250,7 +268,7 @@ func WriteRSAPrivateKey(privateKey *rsa.PrivateKey, directory, name string, pass
 }
 
 func GetRSAPrivateKey(directory, name string, password []byte) (*rsa.PrivateKey, error) {
-	privateKeyPEM, err := ReadPEM(path.Join(directory, name+".go.private"))
+	privateKeyPEM, err := ReadPEM(path.Join(directory, name+privateKeyFileExtension))
 	if err != nil {
 		return nil, err
 	}
