@@ -43,8 +43,11 @@ import (
 )
 
 const (
-	AES_KEY_SIZE_BITS  = 128
-	AES_KEY_SIZE_BYTES = AES_KEY_SIZE_BITS / 8
+	AES_128_KEY_SIZE_BITS  = 128
+	AES_128_KEY_SIZE_BYTES = AES_128_KEY_SIZE_BITS / 8
+
+	AES_256_KEY_SIZE_BITS  = 256
+	AES_256_KEY_SIZE_BYTES = AES_256_KEY_SIZE_BITS / 8
 
 	MIN_PASSWORD = 12
 
@@ -345,7 +348,7 @@ func ExportKeys(host, keystore, name string, password []byte) (string, error) {
 	}
 
 	// Generate a random access code
-	accessCode, err := GenerateRandomKey()
+	accessCode, err := GenerateRandomKey(AES_256_KEY_SIZE_BYTES)
 	if err != nil {
 		return "", err
 	}
@@ -444,7 +447,9 @@ func DecryptKey(algorithm EncryptionAlgorithm, secret []byte, key *rsa.PrivateKe
 
 func DecryptPayload(algorithm EncryptionAlgorithm, key []byte, payload []byte) ([]byte, error) {
 	switch algorithm {
-	case EncryptionAlgorithm_AES_GCM_NOPADDING:
+	case EncryptionAlgorithm_AES_128_GCM_NOPADDING:
+		fallthrough
+	case EncryptionAlgorithm_AES_256_GCM_NOPADDING:
 		return DecryptAESGCM(key, payload)
 	case EncryptionAlgorithm_UNKNOWN_ENCRYPTION:
 		return payload, nil
@@ -453,8 +458,8 @@ func DecryptPayload(algorithm EncryptionAlgorithm, key []byte, payload []byte) (
 	}
 }
 
-func GenerateRandomKey() ([]byte, error) {
-	key := make([]byte, AES_KEY_SIZE_BYTES)
+func GenerateRandomKey(bytes int) ([]byte, error) {
+	key := make([]byte, bytes)
 	if _, err := io.ReadFull(rand.Reader, key); err != nil {
 		return nil, err
 	}
