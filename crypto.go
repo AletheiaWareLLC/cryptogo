@@ -119,7 +119,7 @@ func PublicKeyToRSAPublicKey(key interface{}) (*rsa.PublicKey, error) {
 	case *rsa.PublicKey:
 		return k, nil
 	default:
-		return nil, errors.New(fmt.Sprintf(ERROR_UNSUPPORTED_PUBLIC_KEY_TYPE, k))
+		return nil, fmt.Errorf(ERROR_UNSUPPORTED_PUBLIC_KEY_TYPE, k)
 	}
 }
 
@@ -170,7 +170,7 @@ func PrivateKeyToRSAPrivateKey(key interface{}) (*rsa.PrivateKey, error) {
 	case *rsa.PrivateKey:
 		return k, nil
 	default:
-		return nil, errors.New(fmt.Sprintf(ERROR_UNSUPPORTED_PRIVATE_KEY_TYPE, k))
+		return nil, fmt.Errorf(ERROR_UNSUPPORTED_PRIVATE_KEY_TYPE, k)
 	}
 }
 
@@ -194,7 +194,7 @@ func ParseRSAPublicKey(publicKey []byte, format PublicKeyFormat) (*rsa.PublicKey
 	case PublicKeyFormat_UNKNOWN_PUBLIC_KEY_FORMAT:
 		fallthrough
 	default:
-		return nil, errors.New(fmt.Sprintf(ERROR_UNSUPPORTED_PUBLIC_KEY_FORMAT, format.String()))
+		return nil, fmt.Errorf(ERROR_UNSUPPORTED_PUBLIC_KEY_FORMAT, format.String())
 	}
 }
 
@@ -207,7 +207,7 @@ func ParseRSAPrivateKey(privateKey []byte, format PrivateKeyFormat) (*rsa.Privat
 	case PrivateKeyFormat_UNKNOWN_PRIVATE_KEY_FORMAT:
 		fallthrough
 	default:
-		return nil, errors.New(fmt.Sprintf(ERROR_UNSUPPORTED_PRIVATE_KEY_FORMAT, format.String()))
+		return nil, fmt.Errorf(ERROR_UNSUPPORTED_PRIVATE_KEY_FORMAT, format.String())
 	}
 }
 
@@ -385,7 +385,7 @@ func ExportKeys(host, keystore, name string, password []byte) (string, error) {
 		log.Println("Keys exported")
 		return base64.RawURLEncoding.EncodeToString(accessCode), nil
 	default:
-		return "", errors.New(fmt.Sprintf(ERROR_EXPORT, response.StatusCode, response.Status))
+		return "", fmt.Errorf(ERROR_EXPORT, response.StatusCode, response.Status)
 	}
 }
 
@@ -403,7 +403,7 @@ func ImportKeys(host, keystore, name, accessCode string) error {
 		return err
 	}
 	if name != keyShare.Name {
-		return errors.New(fmt.Sprintf("Incorrect KeyShare Name: %s vs %s", name, keyShare.Name))
+		return fmt.Errorf("Incorrect KeyShare Name: %s vs %s", name, keyShare.Name)
 	}
 	// Decode Access Code
 	decodedAccessCode, err := base64.RawURLEncoding.DecodeString(accessCode)
@@ -441,7 +441,7 @@ func DecryptKey(algorithm EncryptionAlgorithm, secret []byte, key *rsa.PrivateKe
 	case EncryptionAlgorithm_UNKNOWN_ENCRYPTION:
 		return secret, nil
 	default:
-		return nil, errors.New(fmt.Sprintf(ERROR_UNSUPPORTED_ENCRYPTION, algorithm.String()))
+		return nil, fmt.Errorf(ERROR_UNSUPPORTED_ENCRYPTION, algorithm.String())
 	}
 }
 
@@ -454,7 +454,7 @@ func DecryptPayload(algorithm EncryptionAlgorithm, key []byte, payload []byte) (
 	case EncryptionAlgorithm_UNKNOWN_ENCRYPTION:
 		return payload, nil
 	default:
-		return nil, errors.New(fmt.Sprintf(ERROR_UNSUPPORTED_ENCRYPTION, algorithm.String()))
+		return nil, fmt.Errorf(ERROR_UNSUPPORTED_ENCRYPTION, algorithm.String())
 	}
 }
 
@@ -524,7 +524,7 @@ func CreateSignature(privateKey *rsa.PrivateKey, data []byte, algorithm Signatur
 	case SignatureAlgorithm_UNKNOWN_SIGNATURE:
 		fallthrough
 	default:
-		return nil, errors.New(fmt.Sprintf(ERROR_UNSUPPORTED_SIGNATURE, algorithm))
+		return nil, fmt.Errorf(ERROR_UNSUPPORTED_SIGNATURE, algorithm)
 	}
 }
 
@@ -539,7 +539,7 @@ func VerifySignature(publicKey *rsa.PublicKey, data, signature []byte, algorithm
 	case SignatureAlgorithm_UNKNOWN_SIGNATURE:
 		fallthrough
 	default:
-		return errors.New(fmt.Sprintf(ERROR_UNSUPPORTED_SIGNATURE, algorithm))
+		return fmt.Errorf(ERROR_UNSUPPORTED_SIGNATURE, algorithm)
 	}
 }
 
