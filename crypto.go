@@ -348,7 +348,7 @@ func ExportKeys(host, keystore, name string, password []byte) (string, error) {
 	}
 
 	// Generate a random access code
-	accessCode, err := GenerateRandomKey(AES_256_KEY_SIZE_BYTES)
+	accessCode, err := GenerateRandomKey(AES_128_KEY_SIZE_BYTES)
 	if err != nil {
 		return "", err
 	}
