@@ -17,8 +17,8 @@
 package cryptogo_test
 
 import (
+	"aletheiaware.com/cryptogo"
 	"encoding/base64"
-	"github.com/AletheiaWareLLC/cryptogo"
 	"github.com/golang/protobuf/proto"
 	"log"
 	"net/http"
