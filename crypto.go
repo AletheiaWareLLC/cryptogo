@@ -293,7 +293,7 @@ func GetPassword() ([]byte, error) {
 	if ok {
 		return []byte(pwd), nil
 	} else {
-		return ReadPassword("Enter keystore password: ")
+		return ReadPassword("Enter password: ")
 	}
 }
 
@@ -320,9 +320,9 @@ func GetOrCreateRSAPrivateKey(directory, name string) (*rsa.PrivateKey, error) {
 
 		return key, nil
 	} else {
-		log.Println("Creating keystore under " + directory + " for " + name)
+		log.Println("Creating key in " + directory + " for " + name)
 
-		confirm, err := ReadPassword("Confirm keystore password: ")
+		confirm, err := ReadPassword("Confirm password: ")
 		if err != nil {
 			return nil, err
 		}
