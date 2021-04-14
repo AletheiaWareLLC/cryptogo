@@ -308,6 +308,7 @@ func ReadPassword(prompt string) ([]byte, error) {
 }
 
 func GetOrCreateRSAPrivateKey(directory, name string) (*rsa.PrivateKey, error) {
+	log.Println("Alias:", name)
 	password, err := GetPassword()
 	if err != nil {
 		return nil, err
