@@ -399,6 +399,9 @@ func ImportKeys(host, keystore, name, accessCode string) error {
 	if err != nil {
 		return err
 	}
+	if len(data) <= 0 {
+		return fmt.Errorf("Could not get KeyShare for %s", name)
+	}
 	keyShare := &KeyShare{}
 	if err = proto.Unmarshal(data, keyShare); err != nil {
 		return err
