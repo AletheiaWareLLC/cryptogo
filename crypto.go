@@ -270,7 +270,7 @@ func WriteRSAPrivateKey(privateKey *rsa.PrivateKey, directory, name string, pass
 	return nil
 }
 
-func GetRSAPrivateKey(directory, name string, password []byte) (*rsa.PrivateKey, error) {
+func RSAPrivateKey(directory, name string, password []byte) (*rsa.PrivateKey, error) {
 	privateKeyPEM, err := ReadPEM(path.Join(directory, name+privateKeyFileExtension))
 	if err != nil {
 		return nil, err
@@ -288,7 +288,7 @@ func GetRSAPrivateKey(directory, name string, password []byte) (*rsa.PrivateKey,
 	return PrivateKeyToRSAPrivateKey(priv)
 }
 
-func GetPassword() ([]byte, error) {
+func Password() ([]byte, error) {
 	pwd, ok := os.LookupEnv("PASSWORD")
 	if ok {
 		return []byte(pwd), nil
@@ -307,14 +307,14 @@ func ReadPassword(prompt string) ([]byte, error) {
 	return password, nil
 }
 
-func GetOrCreateRSAPrivateKey(directory, name string) (*rsa.PrivateKey, error) {
+func LoadRSAPrivateKey(directory, name string) (*rsa.PrivateKey, error) {
 	log.Println("Alias:", name)
-	password, err := GetPassword()
+	password, err := Password()
 	if err != nil {
 		return nil, err
 	}
 	if HasRSAPrivateKey(directory, name) {
-		key, err := GetRSAPrivateKey(directory, name, password)
+		key, err := RSAPrivateKey(directory, name, password)
 		if err != nil {
 			return nil, err
 		}
@@ -343,7 +343,7 @@ func GetOrCreateRSAPrivateKey(directory, name string) (*rsa.PrivateKey, error) {
 }
 
 func ExportKeys(host, keystore, name string, password []byte) (string, error) {
-	privateKey, err := GetRSAPrivateKey(keystore, name, password)
+	privateKey, err := RSAPrivateKey(keystore, name, password)
 	if err != nil {
 		return "", err
 	}
